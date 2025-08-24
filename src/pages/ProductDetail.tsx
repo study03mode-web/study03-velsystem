@@ -8,7 +8,7 @@ import { Product } from '../types/product';
 const ProductDetail = React.memo(() => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { addToCart, isInCart, getCartItemQuantity } = useCart();
+  const { addToCart, isInCart, getCartItemQuantity, loading: cartLoading } = useCart();
   const [selectedVariant, setSelectedVariant] = useState(0);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -215,10 +215,15 @@ const ProductDetail = React.memo(() => {
 
               <button
                 onClick={handleAddToCart}
-                disabled={addingToCart}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center"
+                disabled={addingToCart || cartLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-green-600 disabled:opacity-75 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center"
               >
-                {addingToCart ? (
+                {cartLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Adding to Cart...
+                  </>
+                ) : addingToCart ? (
                   <>
                     <Check size={20} className="mr-2" />
                     Added to Cart!

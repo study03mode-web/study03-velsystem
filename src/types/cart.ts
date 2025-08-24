@@ -19,6 +19,7 @@ export interface Cart {
 
 export interface CartContextType {
   cart: Cart;
+  loading: boolean;
   addToCart: (item: Omit<CartItem, 'id' | 'quantity'>, quantity?: number) => void;
   removeFromCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;

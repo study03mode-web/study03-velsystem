@@ -67,6 +67,7 @@ const FireAlarms = lazy(() => import('./pages/securitySolutions/FireAlarms'));
 const ComingSoon = lazy(() => import('./pages/ComingSoon'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const Profile = lazy(() => import('./pages/Profile'));
+const Cart = lazy(() => import('./pages/Cart'));
 
 function App() {
   return (
@@ -129,6 +130,7 @@ function App() {
                     <Route path="/returns-refunds-cancellations-exchange-policy" element={<ReturnsPolicy />} />
                     <Route path="/shipping-policy" element={<ShippingPolicy />} />
                     <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                    <Route path="/cart" element={<Cart />} />
                   </Routes>
                 </Suspense>
               </main>

@@ -10,7 +10,7 @@ interface ProductCardProps {
 
 const ProductCard = React.memo(({ product }: ProductCardProps) => {
   const navigate = useNavigate();
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, isInCart, loading } = useCart();
 
   const handleViewDetails = () => {
     navigate(`/shop/${product.id}`);
@@ -82,14 +82,17 @@ const ProductCard = React.memo(({ product }: ProductCardProps) => {
           <button
             onClick={handleAddToCart}
             disabled={itemInCart}
-            className={`flex-1 flex items-center justify-center py-2 px-3 rounded-lg font-medium transition-colors duration-300 ${
+            disabled={itemInCart || loading}
+            className={`flex-1 flex items-center justify-center py-2 px-3 rounded-lg font-medium transition-colors duration-300 disabled:opacity-50 ${
               itemInCart
                 ? 'bg-green-100 text-green-700 cursor-not-allowed'
+                : loading
+                ? 'bg-blue-400 text-white cursor-not-allowed'
                 : 'bg-blue-600 hover:bg-blue-700 text-white'
             }`}
           >
             <ShoppingCart size={16} className="mr-1" />
-            {itemInCart ? 'In Cart' : 'Add to Cart'}
+            {loading ? 'Adding...' : itemInCart ? 'In Cart' : 'Add to Cart'}
           </button>
           <button
             onClick={(e) => {
