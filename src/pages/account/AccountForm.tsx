@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, X } from 'lucide-react';
+import { ArrowLeft, Plus, X, Building2, Wallet, CreditCard, Banknote } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { 
   useCreateBankAccount, 
@@ -162,6 +162,24 @@ function AccountForm() {
     setPaymentModes(prev => prev.filter((_, i) => i !== index));
   };
 
+  const getAccountIcon = (tabIndex: number) => {
+    switch (tabIndex) {
+      case 0: return <Building2 className="w-5 h-5" />;
+      case 1: return <Wallet className="w-5 h-5" />;
+      case 2: return <CreditCard className="w-5 h-5" />;
+      default: return <Building2 className="w-5 h-5" />;
+    }
+  };
+
+  const getAccountColor = (tabIndex: number) => {
+    switch (tabIndex) {
+      case 0: return 'bg-blue-500';
+      case 1: return 'bg-green-500';
+      case 2: return 'bg-purple-500';
+      default: return 'bg-blue-500';
+    }
+  };
+
   const isPending = createBankAccount.isPending || createWallet.isPending || createCreditCard.isPending ||
                    updateBankAccount.isPending || updateWallet.isPending || updateCreditCard.isPending;
 
@@ -202,34 +220,6 @@ function AccountForm() {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6 lg:space-y-8">
-        {/* Account Type Tabs */}
-        {!isEditing && (
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-3 sm:mb-4">
-              Account Type
-            </label>
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              {tabs.map((tab, index) => {
-                const active = activeTab === index;
-                return (
-                  <button
-                    key={tab}
-                    type="button"
-                    onClick={() => setActiveTab(index)}
-                    className={`flex-1 text-xs sm:text-sm font-medium rounded-lg py-2 transition-all duration-200 ${
-                      active
-                        ? "bg-white shadow text-black"
-                        : "text-gray-500 hover:text-black"
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {/* Account Name */}
         <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <label htmlFor="name" className="block text-sm sm:text-base font-medium text-gray-700 mb-2">
@@ -246,6 +236,37 @@ function AccountForm() {
             <p className="mt-1 text-xs sm:text-sm text-red-600">{errors.name.message}</p>
           )}
         </div>
+
+        {/* Account Type */}
+        {!isEditing && (
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <label className="block text-sm sm:text-base font-medium text-gray-700 mb-3 sm:mb-4">
+              Account Type
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+              {tabs.map((tab, index) => {
+                const active = activeTab === index;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(index)}
+                    className={`p-3 sm:p-4 rounded-lg border-2 text-xs sm:text-sm font-medium transition-all flex flex-col items-center space-y-2 ${
+                      active
+                        ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${active ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                      {getAccountIcon(index)}
+                    </div>
+                    <span>{tab}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Bank Account Fields */}
         {activeTab === 0 && (
@@ -273,38 +294,53 @@ function AccountForm() {
             {/* Linked Payment Modes */}
             <div className="bg-white rounded-lg shadow p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <label className="block text-sm sm:text-base font-medium text-gray-700">
-                  Linked Payment Modes (Optional)
-                </label>
+                <div>
+                  <label className="block text-sm sm:text-base font-medium text-gray-700">
+                    Linked Payment Modes
+                  </label>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-1">
+                    {paymentModes.length === 0
+                      ? 'No payment modes added yet'
+                      : `${paymentModes.length} payment mode(s) linked to this account`
+                    }
+                  </p>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsPaymentModeModalOpen(true)}
-                  className="inline-flex items-center px-2 sm:px-3 py-1 text-xs sm:text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center px-3 py-2 text-xs sm:text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
                 >
                   <Plus className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                   Add
                 </button>
               </div>
 
-              {paymentModes.length === 0 ? (
-                <p className="text-gray-500 text-xs sm:text-sm">No payment modes added yet</p>
-              ) : (
-                <div className="space-y-2 sm:space-y-3">
+              {paymentModes.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                   {paymentModes.map((mode, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 sm:p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <p className="text-sm sm:text-base font-medium text-gray-900">{mode.name}</p>
-                        <p className="text-xs sm:text-sm text-gray-500">{PAYMENT_MODE_TYPES[mode.type]}</p>
+                    <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-2 rounded-lg ${getAccountColor(0)}`}>
+                          <CreditCard className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{mode.name}</p>
+                          <p className="text-xs text-gray-500">{PAYMENT_MODE_TYPES[mode.type]}</p>
+                        </div>
                       </div>
                       <button
                         type="button"
                         onClick={() => removePaymentMode(index)}
                         className="text-red-500 hover:text-red-700 transition-colors p-1"
                       >
-                        <X className="w-4 h-4 sm:w-5 sm:h-5" />
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
+                </div>
+              ) : (
+                <div className="text-center py-4 text-xs sm:text-sm text-gray-500">
+                  No payment modes added yet
                 </div>
               )}
             </div>
@@ -412,6 +448,27 @@ function AccountForm() {
             </div>
           </>
         )}
+
+        {/* Preview */}
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <label className="block text-sm sm:text-base font-medium text-gray-700 mb-3 sm:mb-4">
+            Preview
+          </label>
+          <div className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+            <div className={`p-2 rounded-lg ${getAccountColor(activeTab)}`}>
+              {getAccountIcon(activeTab)}
+            </div>
+            <div>
+              <p className="text-sm sm:text-base font-medium text-gray-900">
+                {watch('name') || 'Account Name'}
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">
+                {tabs[activeTab]}
+                {activeTab === 0 && paymentModes.length > 0 && ` • ${paymentModes.length} payment mode(s)`}
+              </p>
+            </div>
+          </div>
+        </div>
 
         {/* Error Messages */}
         {(createBankAccount.error || createWallet.error || createCreditCard.error ||
