@@ -1,26 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Edit,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  ArrowUpDown,
-  DollarSign,
-  ChevronLeft,
-  ChevronRight,
-  Building2,
-  Wallet,
-  CreditCard,
-  Banknote,
-  Smartphone,
-  FileText,
-  Globe,
-  Eye,
-  EyeOff,
-  Settings,
-} from 'lucide-react';
+import { ArrowLeft, CreditCard as Edit, Trash2, TrendingUp, TrendingDown, ArrowUpDown, DollarSign, ChevronLeft, ChevronRight, Building2, Wallet, CreditCard, Banknote, Smartphone, FileText, Globe, Eye, EyeOff, Settings } from 'lucide-react';
 import { useAccount, useCreateAccountAdjustment } from '../../hooks/useAccounts';
 import {
   useAccountTransactions,
@@ -277,22 +257,10 @@ function AccountDetail() {
               </div>
             </div>
           ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-center gap-2">
+            <div>
               <p className="text-sm text-gray-500">Current Balance</p>
-                <button
-                  onClick={() => setIsBalanceEditModalOpen(true)}
-                  className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition"
-                  title="Edit Balance"
-                >
-                  <Settings className="w-4 h-4" />
-                </button>
-              </div>
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrencyWithVisibility(account.currentBalance || 0)}
-              </p>
-              <p className="text-xs text-yellow-600">
-                * Transaction-based balance, actual may vary
               </p>
             </div>
           )}
@@ -511,17 +479,6 @@ function AccountDetail() {
         confirmButtonClass="bg-red-600 hover:bg-red-700"
         isPending={deleteTransaction.isPending}
       />
-
-      {/* Balance Edit Modal */}
-      {account && (
-        <BalanceEditModal
-          isOpen={isBalanceEditModalOpen}
-          onClose={() => setIsBalanceEditModalOpen(false)}
-          account={account}
-          onSubmit={handleBalanceAdjustment}
-          isPending={createAdjustment.isPending}
-        />
-      )}
     </div>
   );
 }
