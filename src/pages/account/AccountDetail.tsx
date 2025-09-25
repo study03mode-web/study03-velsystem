@@ -19,8 +19,9 @@ import {
   Globe,
   Eye,
   EyeOff,
+  Settings,
 } from 'lucide-react';
-import { useAccount } from '../../hooks/useAccounts';
+import { useAccount, useCreateAccountAdjustment } from '../../hooks/useAccounts';
 import {
   useAccountTransactions,
   useAccountDebitTransactions,
@@ -33,6 +34,7 @@ import { TRANSACTION_TYPES } from '../../types/transaction';
 import { DEBT_TRANSACTION_TYPES } from '../../types/debt';
 import CategoryIcon from '../../components/CategoryIcon';
 import ConfirmationModal from '../../components/ConfirmationModal';
+import BalanceEditModal from '../../components/BalanceEditModal';
 
 const tabs = ['All', 'Credit', 'Debit', 'Adjustment'];
 
@@ -43,6 +45,7 @@ function AccountDetail() {
   const [pageSize] = useState(10);
   const [showBalance, setShowBalance] = useState(false);
   const [transactionToDelete, setTransactionToDelete] = useState<{ id: string; description: string } | null>(null);
+  const [isBalanceEditModalOpen, setIsBalanceEditModalOpen] = useState(false);
 
   const { data: account, isLoading: accountLoading } = useAccount(id || '');
 
@@ -53,6 +56,7 @@ function AccountDetail() {
   const { data: adjustmentTransactions, isLoading: adjustmentLoading } = useAccountAdjustmentTransactions(id || '', currentPage, pageSize, activeTab === 3);
 
   const deleteTransaction = useDeleteTransaction();
+  const createAdjustment = useCreateAccountAdjustment();
   const { formatCurrency } = useFormatters();
 
   const getCurrentData = () => {
@@ -72,6 +76,22 @@ function AccountDetail() {
     if (transactionToDelete) {
       await deleteTransaction.mutateAsync(transactionToDelete.id);
       setTransactionToDelete(null);
+    }
+  };
+
+  const handleBalanceAdjustment = async (data: {
+    type: string;
+    txnDate: string;
+    txnTime: string;
+    amount: number;
+    description: string;
+    accountId: string;
+  }) => {
+    try {
+      await createAdjustment.mutateAsync(data);
+      setIsBalanceEditModalOpen(false);
+    } catch (error) {
+      console.error('Failed to adjust balance:', error);
     }
   };
 
@@ -257,10 +277,22 @@ function AccountDetail() {
               </div>
             </div>
           ) : (
-            <div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-2">
               <p className="text-sm text-gray-500">Current Balance</p>
+                <button
+                  onClick={() => setIsBalanceEditModalOpen(true)}
+                  className="p-1 rounded-full hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition"
+                  title="Edit Balance"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+              </div>
               <p className="text-2xl font-bold text-gray-900">
                 {formatCurrencyWithVisibility(account.currentBalance || 0)}
+              </p>
+              <p className="text-xs text-yellow-600">
+                * Transaction-based balance, actual may vary
               </p>
             </div>
           )}
@@ -479,6 +511,17 @@ function AccountDetail() {
         confirmButtonClass="bg-red-600 hover:bg-red-700"
         isPending={deleteTransaction.isPending}
       />
+
+      {/* Balance Edit Modal */}
+      {account && (
+        <BalanceEditModal
+          isOpen={isBalanceEditModalOpen}
+          onClose={() => setIsBalanceEditModalOpen(false)}
+          account={account}
+          onSubmit={handleBalanceAdjustment}
+          isPending={createAdjustment.isPending}
+        />
+      )}
     </div>
   );
 }

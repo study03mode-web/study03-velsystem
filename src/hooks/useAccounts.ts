@@ -17,6 +17,41 @@ import {
   DefaultPaymentMode
 } from '../types/account';
 
+// Create account adjustment
+export const useCreateAccountAdjustment = () => {
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+
+  return useMutation({
+    mutationFn: async (data: {
+      type: string;
+      txnDate: string;
+      txnTime: string;
+      amount: number;
+      description: string;
+      accountId: string;
+    }) => {
+      const response = await apiClient.post('/transactions/adjustment', data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['accounts'] });
+      queryClient.invalidateQueries({ queryKey: ['account'] });
+      queryClient.invalidateQueries({ queryKey: ['account-transactions'] });
+      addToast({
+        type: 'success',
+        message: 'Balance adjusted successfully'
+      });
+    },
+    onError: () => {
+      addToast({
+        type: 'error',
+        message: 'Failed to adjust balance'
+      });
+    },
+  });
+};
+
 // Get all accounts
 export const useAccounts = () => {
   return useQuery<Account[]>({
